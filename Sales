@@ -1,0 +1,49 @@
+#In this SQL, I'm querying a database titled BIT_DB_sara with multiple tables in it to quantify statistics about customer and order data. 
+
+#1. How many orders were placed in January? 
+SELECT COUNT(orderid)
+FROM BIT_DB_sara.JanSales
+WHERE length(orderid) = 6 
+AND orderid <> 'Order ID'
+
+#2. How many of those orders were for an iPhone?
+SELECT COUNT(orderid) 
+FROM BIT_DB_sara.JanSales  
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID'
+AND Product = "iPhone";
+
+#3. Select the customer account numbers for all of the orders that were placed in February.
+SELECT DISTINCT acctnum 
+FROM BIT_DB_sara.customers customers
+INNERJOIN BIT_DB_sara.FebSales febsales
+ON customers.order_id = febsales.orderID
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+
+#4. Which product was the cheapest one sold in January, and what was the price?
+SELECT distinct product, price
+FROM BIT_DB_sara.JanSales
+ORDER BY price asc LIMIT 1;
+
+#5. What is the total revenue for each product sold in January?
+SELECT SUM(quantity)*price AS revenue, product
+FROM BIT_DB_sara.JanSales
+GROUP BY product;
+
+#6. Which products were sold in February at 548 Lincoln St, Seattle WA 98101, how many of each were sold, and what was the total revenue?
+SELECT SUM(quantity), product, SUM(quantity)*price AS revenue
+FROM BIT_DB_sara.FebSales
+AND location = "548 Lincoln St, Seattle, WA 98101" 
+GROUP BY product;
+
+#7. How many customers ordered more than 2 products at a time in February, and what was the average amount spent for those customers?
+SELECT COUNT(distinct acctnum), AVG(quantity*price)
+FROM BIT_DB_sara.FebSales feb
+LEFT JOIN BIT_DB_sara.customers cust
+ON feb.orderID = cust.order_id
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID'
+AND Quantity > 2;
+
+
